@@ -1,15 +1,22 @@
 const express = require("express");
 const app = express(); // instantiate express
 const cors = require("cors");
-const bodyParser = require("body-parser");
-const videoRoutes = require("./routes/videos");
-
 require("dotenv").config();
 const { PORT, CORS_ORIGIN } = process.env;
+// ROUTES
+const videoRoutes = require("./routes/videos");
 
-app.use(cors({ origin: CORS_ORIGIN })); // CORS middleware
+// MIDDLEWARES
+express.static("public");
+app.use(express.json());
+app.use(cors({ origin: CORS_ORIGIN }));
 
-app.get("/video", videoRoutes);
+app.get("/videos", videoRoutes);
+app.get("/videos/:id", videoRoutes);
+app.post("/videos", videoRoutes); // post video
+app.post("/videos/:id/comments", videoRoutes); // post comment - id == id of video
+app.delete("/videos/:id/comments/:commentId", videoRoutes); // id == id of video, commentId == id of a comment
+app.put("/comments/:commentId/like", videoRoutes); // id == id of comments
 
 app.listen(PORT, () => {
   console.log(`App is listening on port ${PORT}`);
