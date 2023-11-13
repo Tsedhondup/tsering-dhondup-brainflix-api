@@ -48,18 +48,48 @@ router.get("/videos/:id", (req, res, next) => {
       return;
     }
   });
+});
 
-  //   res.send("this is your main video");
-});
+// POST THE VIDEO
 router.post("/videos", (req, res, next) => {
-  res.send("your video had posted successfully!");
+  // get the video JSON file
+  fs.readFile("./data/videos.json", (error, data) => {
+    if (error) {
+      res.send("no such directory is found!");
+    } else {
+      // parsing video.json and store in new array
+      const videoArray = JSON.parse(data);
+      // getting the request body and store in new variable
+      const requestObject = req.body;
+      // Dynamic timestamp
+      requestObject.timestamp = new Date().getTime();
+      // push the request body into new array
+      videoArray.unshift(requestObject);
+      // using fs.writeFile, update the videos.json file
+
+      fs.writeFile("./data/videos.json", JSON.stringify(videoArray), (err) => {
+        if (err) {
+          console.log("Cannot update files");
+        }
+      });
+      res.send(requestObject);
+
+      return;
+    }
+  });
 });
+
+// POST COMMENTS
 router.post("/videos/:id/comments", (req, res, next) => {
   res.send("comment posted succesfully");
 });
+
+// DELETE COMMENTS
 router.delete("/videos/:id/comments/:commentId", (req, res, next) => {
   res.send("Comment had been deleted!");
 });
+
+// UPDATE LIKES
 router.put("/comments/:commentId/like", (req, res, next) => {
   res.send("Thank for liking comments");
 });
