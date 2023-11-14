@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const fs = require("fs");
+const { v4: uuidv4 } = require("uuid");
 
 // GET NEXT VIDEO LIST
 router.get("/videos", (req, res, next) => {
@@ -81,7 +82,49 @@ router.post("/videos", (req, res, next) => {
 
 // POST COMMENTS
 router.post("/videos/:id/comments", (req, res, next) => {
-  res.send("comment posted succesfully");
+  // read videos.json file
+  fs.readFile("./data/videos.json", (error, data) => {
+    if (error) {
+      console.log("cannot add comments");
+    } else {
+      // store the video list in new variable
+      const videoArrayInstance = JSON.parse(data);
+      // get the value of req.params
+      const requestedObjectId = req.params.id;
+      // create the commentObject
+      let commentObject;
+      // loop through the newArrayInstance and find the object that match the id of requestedObjectId
+      videoArrayInstance.forEach((videoElement) => {
+        if (videoElement.id === requestedObjectId) {
+          // get the body of requet object
+          const requestedComment = req.body.comment;
+          // create comment object
+          commentObject = {
+            id: uuidv4(),
+            name: "Tsering Dhondup",
+            comment: requestedComment,
+            likes: 0,
+            timestamp: new Date().getTime(),
+          };
+          videoElement.comments.unshift(commentObject);
+        }
+      });
+
+      // update the video.json file
+      fs.writeFile(
+        "./data/videos.json",
+        JSON.stringify(videoArrayInstance),
+        (error) => {
+          console.log("cannot update file");
+        }
+      );
+      // send the response
+      res.send(commentObject);
+      return;
+    }
+  });
+
+  //   res.send("comment posted succesfully");
 });
 
 // DELETE COMMENTS
