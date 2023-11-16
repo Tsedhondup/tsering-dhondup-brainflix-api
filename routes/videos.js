@@ -26,7 +26,7 @@ router.get("/videos", (req, res, next) => {
        when using json has respond method:
        it will automatically convert the object into json on sending
        */
-      res.json(reducedVideos);
+      res.send(reducedVideos);
       return;
     }
   });
@@ -45,7 +45,7 @@ router.get("/videos/:id", (req, res, next) => {
       const filteredVideo = JSON.parse(data).filter((vidObject) => {
         return vidObject.id === videoId;
       });
-      res.json(filteredVideo);
+      res.send(filteredVideo);
       return;
     }
   });
@@ -87,17 +87,14 @@ router.post("/videos/:id/comments", (req, res, next) => {
     if (error) {
       console.log("cannot add comments");
     } else {
-      // store the video list in new variable
-      const videoArrayInstance = JSON.parse(data);
-      // get the value of req.params
-      const requestedObjectId = req.params.id;
-      // create the commentObject
-      let commentObject;
+      const videoArrayInstance = JSON.parse(data); // store the video list in new variable
+      const requestedObjectId = req.params.id; // get the value of req.params
+      let commentObject; // create the commentObject
+
       // loop through the newArrayInstance and find the object that match the id of requestedObjectId
       videoArrayInstance.forEach((videoElement) => {
         if (videoElement.id === requestedObjectId) {
-          // get the body of requet object
-          const requestedComment = req.body.comment;
+          const requestedComment = req.body.comment; // get the body of requet object
           // create comment object
           commentObject = {
             id: uuidv4(),
@@ -106,7 +103,7 @@ router.post("/videos/:id/comments", (req, res, next) => {
             likes: 0,
             timestamp: new Date().getTime(),
           };
-          videoElement.comments.unshift(commentObject);
+          videoElement.comments.push(commentObject);
         }
       });
 
@@ -119,17 +116,44 @@ router.post("/videos/:id/comments", (req, res, next) => {
         }
       );
       // send the response
-      res.send(commentObject);
+      res.json(commentObject);
       return;
     }
   });
-
-  //   res.send("comment posted succesfully");
 });
 
 // DELETE COMMENTS
 router.delete("/videos/:id/comments/:commentId", (req, res, next) => {
-  res.send("Comment had been deleted!");
+  fs.readFile("./data/videos.json", (err, data) => {
+    if (err) {
+      res.send("Cannot delete comments");
+      return;
+    } else {
+      const videoId = req.params.id; // get the video id
+      const commentId = req.params.commentId; // get the comment id
+      const videoArrayCopy = JSON.parse(data); // create a shallow copy of video.json data
+      // deleting comment
+      videoArrayCopy.forEach((videoObj) => {
+        if (videoObj.id === videoId) {
+          videoObj.comments = videoObj.comments.filter((comment) => {
+            return comment.id !== commentId;
+          });
+        }
+      });
+      // updating data base
+      fs.writeFile(
+        "./data/videos.json",
+        JSON.stringify(videoArrayCopy),
+        (err) => {
+          if (err) {
+            res.send("cannot delete comment!");
+          }
+        }
+      );
+      res.json({ id: commentId }); // sending deleted comment Id
+      return;
+    }
+  });
 });
 
 // UPDATE LIKES
