@@ -58,23 +58,38 @@ router.post("/videos", (req, res, next) => {
     if (error) {
       res.send("no such directory is found!");
     } else {
-      // parsing video.json and store in new array
-      const videoArray = JSON.parse(data);
-      // getting the request body and store in new variable
-      const requestObject = req.body;
-      // Dynamic timestamp
-      requestObject.timestamp = new Date().getTime();
+      // making a copy of video array object
+      const videoDataCopy = JSON.parse(data);
+
+      // creating video object
+      const newVideo = {
+        id: uuidv4(),
+        title: req.body.title,
+        channel: req.body.channel,
+        image: "http://localhost:8080/images/minas-tirith.png.",
+        description: req.body.description,
+        views: 0,
+        likes: 0,
+        duration: "4:20",
+        video: "https://project-2-api.herokuapp.com/stream",
+        timestamp: new Date().getTime(),
+        comments: [],
+      };
+
       // push the request body into new array
-      videoArray.unshift(requestObject);
-      // using fs.writeFile, update the videos.json file
+      videoDataCopy.unshift(newVideo);
 
-      fs.writeFile("./data/videos.json", JSON.stringify(videoArray), (err) => {
-        if (err) {
-          console.log("Cannot update files");
+      fs.writeFile(
+        "./data/videos.json",
+        JSON.stringify(videoDataCopy),
+        (err) => {
+          if (err) {
+            console.log("Cannot update files");
+          }
         }
-      });
-      res.send(requestObject);
+      );
 
+      res.send(newVideo);
       return;
     }
   });
@@ -87,12 +102,12 @@ router.post("/videos/:id/comments", (req, res, next) => {
     if (error) {
       console.log("cannot add comments");
     } else {
-      const videoArrayInstance = JSON.parse(data); // store the video list in new variable
+      const videoDataCopy = JSON.parse(data); // store the video list in new variable
       const requestedObjectId = req.params.id; // get the value of req.params
       let commentObject; // create the commentObject
 
       // loop through the newArrayInstance and find the object that match the id of requestedObjectId
-      videoArrayInstance.forEach((videoElement) => {
+      videoDataCopy.forEach((videoElement) => {
         if (videoElement.id === requestedObjectId) {
           const requestedComment = req.body.comment; // get the body of requet object
           // create comment object
@@ -110,7 +125,7 @@ router.post("/videos/:id/comments", (req, res, next) => {
       // update the video.json file
       fs.writeFile(
         "./data/videos.json",
-        JSON.stringify(videoArrayInstance),
+        JSON.stringify(videoDataCopy),
         (error) => {
           console.log("cannot update file");
         }
@@ -131,9 +146,9 @@ router.delete("/videos/:id/comments/:commentId", (req, res, next) => {
     } else {
       const videoId = req.params.id; // get the video id
       const commentId = req.params.commentId; // get the comment id
-      const videoArrayCopy = JSON.parse(data); // create a shallow copy of video.json data
+      const videoDataCopy = JSON.parse(data); // create a shallow copy of video.json data
       // deleting comment
-      videoArrayCopy.forEach((videoObj) => {
+      videoDataCopy.forEach((videoObj) => {
         if (videoObj.id === videoId) {
           videoObj.comments = videoObj.comments.filter((comment) => {
             return comment.id !== commentId;
@@ -143,7 +158,7 @@ router.delete("/videos/:id/comments/:commentId", (req, res, next) => {
       // updating data base
       fs.writeFile(
         "./data/videos.json",
-        JSON.stringify(videoArrayCopy),
+        JSON.stringify(videoDataCopy),
         (err) => {
           if (err) {
             res.send("cannot delete comment!");
@@ -158,6 +173,34 @@ router.delete("/videos/:id/comments/:commentId", (req, res, next) => {
 
 // UPDATE LIKES
 router.put("/comments/:commentId/like", (req, res, next) => {
-  res.send("Thank for liking comments");
+  fs.readFile("./data/videos.json", (err, data) => {
+    const commentId = req.params.commentId;
+    const videoDataCopy = JSON.parse(data);
+    let respondComment; // variable to store matched comment which will be sent to client
+
+    // updating likes
+    videoDataCopy.forEach((videoObj) => {
+      // loopimg videoObj comment properties
+      videoObj.comments.forEach((comment) => {
+        // if comment.id === commentId params
+        if (comment.id === commentId) {
+          comment.likes += 1;
+          // comment.likes + 1;
+          respondComment = comment; // setting respongComment
+        }
+      });
+    });
+
+    // updating data base
+    fs.writeFile("./data/videos.json", JSON.stringify(videoDataCopy), (err) => {
+      if (err) {
+        res.send("cannot update the data base");
+        // console.log("cannot update files!")
+      }
+    });
+
+    res.json(respondComment);
+    return;
+  });
 });
 module.exports = router;
