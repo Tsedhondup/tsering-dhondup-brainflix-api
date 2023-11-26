@@ -21,12 +21,13 @@ router.get("/videos", (req, res, next) => {
           title: video.title,
           channel: video.channel,
           image: video.image,
+          views: video.views,
         });
       }); /* 
        when using json has respond method:
        it will automatically convert the object into json on sending
        */
-      res.send(reducedVideos);
+      res.json(reducedVideos);
       return;
     }
   });
@@ -45,7 +46,7 @@ router.get("/videos/:id", (req, res, next) => {
       const filteredVideo = JSON.parse(data).filter((vidObject) => {
         return vidObject.id === videoId;
       });
-      res.send(filteredVideo);
+      res.json(filteredVideo[0]); // sending first/only one video from this array
       return;
     }
   });
@@ -65,11 +66,11 @@ router.post("/videos", (req, res, next) => {
       const newVideo = {
         id: uuidv4(),
         title: req.body.title,
-        channel: req.body.channel,
-        image: "http://localhost:8080/images/minas-tirith.png.",
+        channel: "Nerd of the Ring",
+        image: "http://localhost:8080/images/minas-tirith.png",
         description: req.body.description,
-        views: 0,
-        likes: 0,
+        views: "0",
+        likes: "0",
         duration: "4:20",
         video: "https://project-2-api.herokuapp.com/stream",
         timestamp: new Date().getTime(),
@@ -138,13 +139,13 @@ router.post("/videos/:id/comments", (req, res, next) => {
 });
 
 // DELETE COMMENTS
-router.delete("/videos/:id/comments/:commentId", (req, res, next) => {
+router.delete("/videos/:videoId/comments/:commentId", (req, res, next) => {
   fs.readFile("./data/videos.json", (err, data) => {
     if (err) {
       res.send("Cannot delete comments");
       return;
     } else {
-      const videoId = req.params.id; // get the video id
+      const videoId = req.params.videoId; // get the video id
       const commentId = req.params.commentId; // get the comment id
       const videoDataCopy = JSON.parse(data); // create a shallow copy of video.json data
       // deleting comment
