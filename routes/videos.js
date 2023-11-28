@@ -2,6 +2,19 @@ const express = require("express");
 const router = express.Router();
 const fs = require("fs");
 const { v4: uuidv4 } = require("uuid");
+const multer = require("multer");
+
+// MULTER STORAGE CONFIGURATION
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "public/images/");
+  },
+  filename: function (req, file, cb) {
+    cb(null, file.originalname);
+  },
+});
+
+const upload = multer({ storage: storage });
 
 // GET NEXT VIDEO LIST
 router.get("/videos", (req, res, next) => {
@@ -53,47 +66,51 @@ router.get("/videos/:id", (req, res, next) => {
 });
 
 // POST THE VIDEO
-router.post("/videos", (req, res, next) => {
+router.post("/videos", upload.single("thumbnail"), (req, res, next) => {
+  console.log(req.file);
+  console.log(req.body.title);
+  res.send("ok");
+  return;
   // get the video JSON file
-  fs.readFile("./data/videos.json", (error, data) => {
-    if (error) {
-      res.send("no such directory is found!");
-    } else {
-      // making a copy of video array object
-      const videoDataCopy = JSON.parse(data);
+  // fs.readFile("./data/videos.json", (error, data) => {
+  //   if (error) {
+  //     res.send("no such directory is found!");
+  //   } else {
+  //     // making a copy of video array object
+  //     const videoDataCopy = JSON.parse(data);
+  //     console.log(req.body.image);
+  //     // creating video object
+  //     const newVideo = {
+  //       id: uuidv4(),
+  //       title: req.body.title,
+  //       channel: "Nerd of the Ring",
+  //       image: "http://localhost:8080/images/minas-tirith.png",
+  //       description: req.body.description,
+  //       views: "0",
+  //       likes: "0",
+  //       duration: "4:20",
+  //       video: "https://project-2-api.herokuapp.com/stream",
+  //       timestamp: new Date().getTime(),
+  //       comments: [],
+  //     };
 
-      // creating video object
-      const newVideo = {
-        id: uuidv4(),
-        title: req.body.title,
-        channel: "Nerd of the Ring",
-        image: "http://localhost:8080/images/minas-tirith.png",
-        description: req.body.description,
-        views: "0",
-        likes: "0",
-        duration: "4:20",
-        video: "https://project-2-api.herokuapp.com/stream",
-        timestamp: new Date().getTime(),
-        comments: [],
-      };
+  //     // push the request body into new array
+  //     videoDataCopy.unshift(newVideo);
 
-      // push the request body into new array
-      videoDataCopy.unshift(newVideo);
+  //     fs.writeFile(
+  //       "./data/videos.json",
+  //       JSON.stringify(videoDataCopy),
+  //       (err) => {
+  //         if (err) {
+  //           console.log("Cannot update files");
+  //         }
+  //       }
+  //     );
 
-      fs.writeFile(
-        "./data/videos.json",
-        JSON.stringify(videoDataCopy),
-        (err) => {
-          if (err) {
-            console.log("Cannot update files");
-          }
-        }
-      );
-
-      res.send(newVideo);
-      return;
-    }
-  });
+  //     res.send(newVideo);
+  //     return;
+  //   }
+  // });
 });
 
 // POST COMMENTS

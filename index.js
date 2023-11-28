@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express(); // instantiate express
 const cors = require("cors");
+
 require("dotenv").config();
 const { PORT, CORS_ORIGIN } = process.env;
 // ROUTES
@@ -10,7 +11,8 @@ const videoRoutes = require("./routes/videos");
 app.use(cors({ origin: CORS_ORIGIN }));
 app.use(express.static("public"));
 app.use(express.json());
-// app.use(express.urlencoded());
+
+
 
 // ROUTES
 app.get("/videos", videoRoutes);
