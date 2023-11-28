@@ -67,50 +67,45 @@ router.get("/videos/:id", (req, res, next) => {
 
 // POST THE VIDEO
 router.post("/videos", upload.single("thumbnail"), (req, res, next) => {
-  console.log(req.file);
-  console.log(req.body.title);
-  res.send("ok");
-  return;
   // get the video JSON file
-  // fs.readFile("./data/videos.json", (error, data) => {
-  //   if (error) {
-  //     res.send("no such directory is found!");
-  //   } else {
-  //     // making a copy of video array object
-  //     const videoDataCopy = JSON.parse(data);
-  //     console.log(req.body.image);
-  //     // creating video object
-  //     const newVideo = {
-  //       id: uuidv4(),
-  //       title: req.body.title,
-  //       channel: "Nerd of the Ring",
-  //       image: "http://localhost:8080/images/minas-tirith.png",
-  //       description: req.body.description,
-  //       views: "0",
-  //       likes: "0",
-  //       duration: "4:20",
-  //       video: "https://project-2-api.herokuapp.com/stream",
-  //       timestamp: new Date().getTime(),
-  //       comments: [],
-  //     };
-
-  //     // push the request body into new array
-  //     videoDataCopy.unshift(newVideo);
-
-  //     fs.writeFile(
-  //       "./data/videos.json",
-  //       JSON.stringify(videoDataCopy),
-  //       (err) => {
-  //         if (err) {
-  //           console.log("Cannot update files");
-  //         }
-  //       }
-  //     );
-
-  //     res.send(newVideo);
-  //     return;
-  //   }
-  // });
+  fs.readFile("./data/videos.json", (error, data) => {
+    if (error) {
+      res.send("no such directory is found!");
+    } else {
+      // making a copy of video array object
+      const videoDataCopy = JSON.parse(data);
+      // creating video object
+      const newVideo = {
+        id: uuidv4(),
+        title: req.body.title,
+        channel: "Nerd of the Ring",
+        // image: `http://localhost:8080/images/${req.file.originalname}`,
+        image: `http://localhost:8080/images/${
+          req.file ? req.file.originalname : "defaultThumbnail.jpeg"
+        }`,
+        description: req.body.description,
+        views: "0",
+        likes: "0",
+        duration: "4:20",
+        video: "https://project-2-api.herokuapp.com/stream",
+        timestamp: new Date().getTime(),
+        comments: [],
+      };
+      // push the request body into new array
+      videoDataCopy.unshift(newVideo);
+      fs.writeFile(
+        "./data/videos.json",
+        JSON.stringify(videoDataCopy),
+        (err) => {
+          if (err) {
+            console.log("Cannot update files");
+          }
+        }
+      );
+      res.send(newVideo);
+      return;
+    }
+  });
 });
 
 // POST COMMENTS
