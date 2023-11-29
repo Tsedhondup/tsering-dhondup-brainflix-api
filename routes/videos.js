@@ -184,7 +184,7 @@ router.delete("/videos/:videoId/comments/:commentId", (req, res, next) => {
   });
 });
 
-// UPDATE LIKES
+// UPDATE COMMENT LIKES
 router.put("/comments/:commentId/like", (req, res, next) => {
   fs.readFile("./data/videos.json", (err, data) => {
     const commentId = req.params.commentId;
@@ -213,6 +213,39 @@ router.put("/comments/:commentId/like", (req, res, next) => {
     });
 
     res.json(respondComment);
+    return;
+  });
+});
+
+// UPDATE VIDEO LIKES
+router.put("/videos/:videoId/like", (req, res, next) => {
+  fs.readFile("./data/videos.json", (err, data) => {
+    const videoId = req.params.videoId;
+    const videoDataCopy = JSON.parse(data);
+    let respondVideo; // variable to store matched video that will be sent to client
+    // updating likes
+    videoDataCopy.forEach((video) => {
+      if (video.id === videoId) {
+        // get the likes
+        const currentLikes = video.likes;
+        // remove non-numeric character from currentLikes
+        let currentLikesInNumber = Number(currentLikes.replace(",", "")); // regular expression for ',' or comma = /[\s,]/g
+        // increment the currentLikesInNumber by +1
+        currentLikesInNumber += 1;
+        // set video.likes key with new value === currentLikesInNumber
+        video.likes = `${currentLikesInNumber}`;
+        // comment.likes + 1;
+        respondVideo = video; // setting response video
+      }
+    });
+    // updating data base
+    fs.writeFile("./data/videos.json", JSON.stringify(videoDataCopy), (err) => {
+      if (err) {
+        res.send("cannot update the data base");
+        // console.log("cannot update files!")
+      }
+    });
+    res.json(respondVideo);
     return;
   });
 });
