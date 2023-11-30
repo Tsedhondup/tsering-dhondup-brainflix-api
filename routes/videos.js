@@ -2,7 +2,8 @@ const express = require("express");
 const router = express.Router();
 const fs = require("fs");
 const { v4: uuidv4 } = require("uuid");
-const multer = require("multer");
+const multer = require("multer"); // multipart/form-data parser - usage: parsed data will be populated in 'req Object'
+const commaNumber = require("comma-number"); // comma number formater - usage: return value must be store in variable
 
 // MULTER STORAGE CONFIGURATION
 const storage = multer.diskStorage({
@@ -232,8 +233,12 @@ router.put("/videos/:videoId/like", (req, res, next) => {
         let currentLikesInNumber = Number(currentLikes.replace(",", "")); // regular expression for ',' or comma = /[\s,]/g
         // increment the currentLikesInNumber by +1
         currentLikesInNumber += 1;
-        // set video.likes key with new value === currentLikesInNumber
-        video.likes = `${currentLikesInNumber}`;
+
+        /*
+         # set video.likes key with new value === currentLikesInNumber 
+         # Convert likes value to comma separated number
+        */
+        video.likes = `${commaNumber(currentLikesInNumber)}`;
         // comment.likes + 1;
         respondVideo = video; // setting response video
       }
