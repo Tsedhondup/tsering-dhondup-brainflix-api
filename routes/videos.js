@@ -80,7 +80,6 @@ router.post("/videos", upload.single("thumbnail"), (req, res, next) => {
         id: uuidv4(),
         title: req.body.title,
         channel: "Nerd of the Ring",
-        // image: `http://localhost:8080/images/${req.file.originalname}`,
         image: `http://localhost:8080/images/${
           req.file ? req.file.originalname : "defaultThumbnail.jpeg"
         }`,
