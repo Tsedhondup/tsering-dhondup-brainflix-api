@@ -168,6 +168,7 @@ router.delete("/videos/:videoId/comments/:commentId", (req, res, next) => {
           });
         }
       });
+      console.log(commentId);
       // updating data base
       fs.writeFile(
         "./data/videos.json",
@@ -178,8 +179,7 @@ router.delete("/videos/:videoId/comments/:commentId", (req, res, next) => {
           }
         }
       );
-      res.status(204).json({ id: commentId }); // sending deleted comment Id
-      return;
+      return res.json({ id: commentId }); // sending deleted comment Id
     }
   });
 });
