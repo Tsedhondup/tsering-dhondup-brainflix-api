@@ -1,5 +1,5 @@
 const express = require("express");
-const app = express(); // instantiate express
+const app = express();
 const cors = require("cors");
 
 require("dotenv").config();
@@ -20,6 +20,7 @@ app.post("/videos/:id/comments", videoRoutes); // post comment - id == id of vid
 app.delete("/videos/:videoId/comments/:commentId", videoRoutes); // id == id of video, commentId == id of a comment
 app.put("/comments/:commentId/like", videoRoutes); // like comment
 app.put("/videos/:videoId/like", videoRoutes); // like video
+app.put("/videos/:videoId/view", videoRoutes); // view video
 
 app.listen(PORT, () => {
   console.log(`App is listening on port ${PORT}`);

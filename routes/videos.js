@@ -2,8 +2,8 @@ const express = require("express");
 const router = express.Router();
 const fs = require("fs");
 const { v4: uuidv4 } = require("uuid");
-const multer = require("multer"); // multipart/form-data parser - usage: parsed data will be populated in 'req Object'
-const commaNumber = require("comma-number"); // comma number formater - usage: return value must be store in variable
+const multer = require("multer"); // multipart/form-data parser
+const commaNumber = require("comma-number"); // comma number formater
 
 // MULTER STORAGE CONFIGURATION
 const storage = multer.diskStorage({
@@ -41,7 +41,7 @@ router.get("/videos", (req, res, next) => {
        when using json has respond method:
        it will automatically convert the object into json on sending
        */
-      res.json(reducedVideos);
+      res.status(200).json(reducedVideos);
       return;
     }
   });
@@ -60,7 +60,7 @@ router.get("/videos/:id", (req, res, next) => {
       const filteredVideo = JSON.parse(data).filter((vidObject) => {
         return vidObject.id === videoId;
       });
-      res.json(filteredVideo[0]); // sending first/only one video from this array
+      res.status(200).json(filteredVideo[0]); // sending first/only one video from this array
       return;
     }
   });
@@ -103,7 +103,7 @@ router.post("/videos", upload.single("thumbnail"), (req, res, next) => {
           }
         }
       );
-      res.send(newVideo);
+      res.status(201).send(newVideo);
       return;
     }
   });
@@ -115,6 +115,7 @@ router.post("/videos/:id/comments", (req, res, next) => {
   fs.readFile("./data/videos.json", (error, data) => {
     if (error) {
       console.log("cannot add comments");
+      return res.status(500).send("Could not read file.");
     } else {
       const videoDataCopy = JSON.parse(data); // store the video list in new variable
       const requestedObjectId = req.params.id; // get the value of req.params
@@ -123,8 +124,9 @@ router.post("/videos/:id/comments", (req, res, next) => {
       // loop through the newArrayInstance and find the object that match the id of requestedObjectId
       videoDataCopy.forEach((videoElement) => {
         if (videoElement.id === requestedObjectId) {
-          const requestedComment = req.body.comment; // get the body of requet object
+          const requestedComment = req.body.comment;
           // create comment object
+
           commentObject = {
             id: uuidv4(),
             name: "Tsering Dhondup",
@@ -144,9 +146,9 @@ router.post("/videos/:id/comments", (req, res, next) => {
           console.log("cannot update file");
         }
       );
+      return res.status(201).json(commentObject);
+
       // send the response
-      res.json(commentObject);
-      return;
     }
   });
 });
@@ -179,7 +181,7 @@ router.delete("/videos/:videoId/comments/:commentId", (req, res, next) => {
           }
         }
       );
-      res.json({ id: commentId }); // sending deleted comment Id
+      res.status(204).json({ id: commentId }); // sending deleted comment Id
       return;
     }
   });
@@ -209,11 +211,10 @@ router.put("/comments/:commentId/like", (req, res, next) => {
     fs.writeFile("./data/videos.json", JSON.stringify(videoDataCopy), (err) => {
       if (err) {
         res.send("cannot update the data base");
-        // console.log("cannot update files!")
       }
     });
 
-    res.json(respondComment);
+    res.status(200).json(respondComment);
     return;
   });
 });
@@ -250,7 +251,42 @@ router.put("/videos/:videoId/like", (req, res, next) => {
         // console.log("cannot update files!")
       }
     });
-    res.json(respondVideo);
+    res.status(200).json(respondVideo);
+    return;
+  });
+});
+// UDATE VIDE0 VIEWS
+router.put("/videos/:videoId/view", (req, res, next) => {
+  fs.readFile("./data/videos.json", (err, data) => {
+    const videoId = req.params.videoId;
+    const videoDataCopy = JSON.parse(data);
+    let respondVideo; // variable to store matched video that will be sent to client
+    // updating views
+    videoDataCopy.forEach((video) => {
+      if (video.id === videoId) {
+        // get the views
+        const currentViews = video.views;
+        // remove non-numeric character from currentViews
+        let currentViewsInNumber = Number(currentViews.replace(/,/g, "")); // replace comma
+        // increment the currentViewsInNumber by +1
+        currentViewsInNumber += 1;
+        /*
+         # set video.views key with new value === currentLikesInNumber 
+         # Convert view value to comma separated number
+        */
+        video.views = `${commaNumber(currentViewsInNumber)}`;
+        // comment.views + 1;
+        respondVideo = video; // setting response video
+      }
+    });
+    // updating data base
+    fs.writeFile("./data/videos.json", JSON.stringify(videoDataCopy), (err) => {
+      if (err) {
+        res.send("cannot update the data base");
+        // console.log("cannot update files!")
+      }
+    });
+    res.status(200).json(respondVideo);
     return;
   });
 });
