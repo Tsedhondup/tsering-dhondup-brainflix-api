@@ -146,8 +146,6 @@ router.post("/videos/:id/comments", (req, res, next) => {
         }
       );
       return res.status(201).json(commentObject);
-
-      // send the response
     }
   });
 });
