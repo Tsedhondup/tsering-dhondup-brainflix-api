@@ -1,5 +1,5 @@
 
-# [BrainFlix](https://tseringdhondup.netlify.app/) 
+# [BrainFlix](https://github.com/Tsedhondup/tsering-dhondup-BrainFlix.git) 
 
 
 BrainFlix is a video streaming web application built as a part of the School Project at BrainStation's Software Engineering Bootcamp.
@@ -35,7 +35,7 @@ Install dependencies:
 npm install
 
 ```
-## [Installation - Front-end](https://github.com/Tsedhondup/EmailReader.gitr)
+## [Installation - Front-end]( https://github.com/Tsedhondup/tsering-dhondup-BrainFlix.git)
 
 Clone the repository with npm:
 
