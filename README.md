@@ -79,7 +79,9 @@ npm start
 ![App Screenshot](https://raw.githubusercontent.com/Tsedhondup/Portfolio/refs/heads/develop/src/assets/image/brainflix.jpg)
 
 
-## Authors
+## Author
 
 - [@Tsedhondup](https://github.com/Tsedhondup)
 
+## Author site URL
+[https://tseringdhondup.netlify.app/](https://tseringdhondup.netlify.app/)
