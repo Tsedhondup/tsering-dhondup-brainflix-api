@@ -6,6 +6,7 @@ require("dotenv").config();
 const { PORT, CORS_ORIGIN } = process.env;
 // ROUTES
 const videoRoutes = require("./routes/videos");
+console.log("hello")
 
 // MIDDLEWARES
 app.use(cors({ origin: CORS_ORIGIN }));
