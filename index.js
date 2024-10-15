@@ -6,7 +6,7 @@ require("dotenv").config();
 const { PORT, CORS_ORIGIN } = process.env;
 // ROUTES
 const videoRoutes = require("./routes/videos");
-console.log("hello")
+console.log("hello");
 
 // MIDDLEWARES
 app.use(cors({ origin: CORS_ORIGIN }));
@@ -24,6 +24,6 @@ app.put("/videos/:videoId/like", videoRoutes); // like video
 app.put("/videos/:videoId/view", videoRoutes); // view video
 app.get("/resume", videoRoutes);
 
-app.listen(PORT, () => {
+app.listen(PORT || 3001, () => {
   console.log(`App is listening on port ${PORT}`);
 });
