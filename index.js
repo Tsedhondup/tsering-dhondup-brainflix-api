@@ -21,6 +21,7 @@ app.delete("/videos/:videoId/comments/:commentId", videoRoutes); // id == id of 
 app.put("/comments/:commentId/like", videoRoutes); // like comment
 app.put("/videos/:videoId/like", videoRoutes); // like video
 app.put("/videos/:videoId/view", videoRoutes); // view video
+app.get("/resume", videoRoutes);
 
 app.listen(PORT, () => {
   console.log(`App is listening on port ${PORT}`);

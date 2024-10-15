@@ -107,7 +107,14 @@ router.post("/videos", upload.single("thumbnail"), (req, res, next) => {
     }
   });
 });
-
+// Testing resume sending
+router.get("/resume", (req, res, next) => {
+  const resume = {
+    resumeFile: `${"http://localhost:8080/pdf/Tsering_Dhondup.pdf"}`,
+  };
+  res.status(200).send(resume);
+  return;
+});
 // POST COMMENTS
 router.post("/videos/:id/comments", (req, res, next) => {
   // read videos.json file
@@ -287,4 +294,5 @@ router.put("/videos/:videoId/view", (req, res, next) => {
     return;
   });
 });
+
 module.exports = router;
